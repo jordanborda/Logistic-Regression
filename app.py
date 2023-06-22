@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import seaborn as sns
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -9,7 +8,13 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
-
+# Crear un marco para el autor
+st.subheader("Autor: Jordan Piero Borda Colque")
+st.markdown(
+    """
+    **Tecnicas Estadisticas Multivariadas**
+    """
+)
 # Cargar dato
 def load_data():
     return pd.read_csv("mary.csv")
@@ -151,12 +156,17 @@ if st.checkbox("Mostrar Correlaciones entre Características"):
     st.plotly_chart(fig)
 
 # Agregar gráfico de regresión logística
+# Mostrar Gráfico de Regresión Logística
 if st.checkbox("Mostrar Gráfico de Regresión Logística"):
     st.subheader("Gráfico de Regresión Logística")
-    sns.set(style="whitegrid")
     x_values = model.decision_function(X_test)[:, 0]  # Seleccionar la columna correspondiente a la clase 0
-    sns.regplot(x=x_values, y=y_test, logistic=True, ci=None)
-    st.pyplot()
+    
+    # Crear el gráfico de regresión logística con Plotly
+    fig = px.scatter(x=x_values, y=y_test, trendline="ols", trendline_color_override="red")
+    fig.update_layout(title="Gráfico de Regresión Logística", xaxis_title="Valores de Decisión", yaxis_title="Valores Reales")
+    
+    st.plotly_chart(fig)
+
 
     # Calcular estadísticas de los coeficientes del modelo
     coefs = pd.DataFrame(model.coef_[0], index=features.columns, columns=["Coeficiente"])
@@ -182,15 +192,22 @@ if st.checkbox("Mostrar Gráfico de Regresión Logística"):
     st.write(f"Sensibilidad: {sensitivity:.4f}")
     st.write(f"Especificidad: {specificity:.4f}")
 
-import seaborn as sns
+
 
 # Calcular la matriz de correlación
 corr_matrix = features.corr()
 
 # Mostrar el heatmap de correlación
-st.subheader("Heatmap de Correlación")
-sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f")
-st.pyplot()
+if st.checkbox("Mostrar Heatmap de Correlación"):
+    st.subheader("Heatmap de Correlación")
+    
+    # Crear el heatmap de correlación con Plotly
+    fig = go.Figure(data=go.Heatmap(z=corr_matrix.values, x=corr_matrix.columns, y=corr_matrix.index,
+                                   colorscale='Viridis', colorbar=dict(title="Correlación"), zmin=-1, zmax=1))
+    fig.update_layout(title="Heatmap de Correlación")
+    
+    st.plotly_chart(fig)
+
 
 
 # Calcular la frecuencia de cada clase
